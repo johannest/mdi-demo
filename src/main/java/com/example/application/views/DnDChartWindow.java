@@ -1,10 +1,5 @@
 package com.example.application.views;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.charts.Chart;
 import com.vaadin.flow.component.charts.model.ChartType;
@@ -15,10 +10,16 @@ import com.vaadin.flow.component.dnd.DropTarget;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.spring.annotation.UIScope;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
-@UIScope
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
+
+@Scope(SCOPE_PROTOTYPE)
 @Component
 @WindowContent(value = "chart", title = "Drag and drop chart", left = "10%", top = "0px", width = "40%")
 public class DnDChartWindow extends VerticalLayout{

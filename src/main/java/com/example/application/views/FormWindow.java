@@ -1,18 +1,19 @@
 package com.example.application.views;
 
-import java.time.LocalDate;
-
-import org.springframework.stereotype.Component;
-
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.spring.annotation.UIScope;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
-@UIScope
+import java.time.LocalDate;
+
+import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
+
+@Scope(SCOPE_PROTOTYPE)
 @Component
 @WindowContent(value = "form", title = "Form", top = "50%", left = "10%", height = "50%", width = "90%")
 public class FormWindow extends FormLayout {

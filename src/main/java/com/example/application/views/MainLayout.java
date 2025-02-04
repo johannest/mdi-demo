@@ -1,6 +1,5 @@
 package com.example.application.views;
 
-import com.example.application.components.window.Window;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.html.Footer;
@@ -14,7 +13,6 @@ import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 /**
@@ -24,10 +22,10 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
 
     private H2 viewTitle;
     private SideNav nav;
-    private WindowFactory windows;
+    private WindowFactory windowFactory;
 
     public MainLayout(WindowFactory windows) {
-        this.windows = windows;
+        this.windowFactory = windows;
         setPrimarySection(Section.DRAWER);
         addDrawerContent();
         addHeaderContent();
@@ -56,14 +54,14 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
         addToDrawer(header, scroller, createFooter());
     }
 
+    // TODO replace SideNav with top navigation for example with https://v-herd.eu/jonte-vaadinplus/top-nav or by Vaadin AppLayout (high priority)
     private SideNav createNavigation() {
         // AppNav is not yet an official component.
         // For documentation, visit https://github.com/vaadin/vcf-nav#readme
         nav = new SideNav();
 
-        windows.getWindows().forEach(name -> {
-            Window window = windows.getWindow(name);
-            SideNavItem win = new SideNavItem(window.getHeaderTitle(),
+        windowFactory.getWindowNames().forEach(name -> {
+            SideNavItem win = new SideNavItem(windowFactory.getWindowTitle(name),
                     "windows/" + name, LineAwesomeIcon.WINDOWS.create());
             nav.addItem(win);
         });

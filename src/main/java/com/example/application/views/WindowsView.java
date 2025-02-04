@@ -1,13 +1,10 @@
 package com.example.application.views;
 
+import com.example.application.components.window.Window;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.router.AfterNavigationEvent;
-import com.vaadin.flow.router.AfterNavigationObserver;
-import com.vaadin.flow.router.BeforeEvent;
-import com.vaadin.flow.router.HasUrlParameter;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteAlias;
-import com.vaadin.flow.router.WildcardParameter;
+import com.vaadin.flow.router.*;
+
+import java.util.Optional;
 
 @Route(value = "windows", layout = MainLayout.class)
 @RouteAlias(value = "", layout = MainLayout.class)
@@ -15,15 +12,15 @@ public class WindowsView extends Div
         implements HasUrlParameter<String>, AfterNavigationObserver {
 
     private String param;
-    private WindowFactory windows;
+    private WindowFactory windowFactory;
 
-    public WindowsView(WindowFactory windows) {
-        this.windows = windows;
+    public WindowsView(WindowFactory windowFactory) {
+        this.windowFactory = windowFactory;
     }
 
     @Override
     public void setParameter(BeforeEvent event,
-            @WildcardParameter String parameter) {
+                             @WildcardParameter String parameter) {
         param = parameter;
     }
 
@@ -31,9 +28,8 @@ public class WindowsView extends Div
     public void afterNavigation(AfterNavigationEvent event) {
         String[] wins = param.split("/");
         for (String win : wins) {
-            if (windows.getWindow(win) != null) {
-                windows.getWindow(win).open();
-            }
+            Optional<Window> window = windowFactory.getWindow(win);
+            window.ifPresent(Window::open);
         }
     }
 }

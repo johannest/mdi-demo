@@ -1,26 +1,19 @@
 package com.example.application.views;
 
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.data.renderer.LitRenderer;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.springframework.stereotype.Component;
+import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
-import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.Shortcuts;
-import com.vaadin.flow.component.contextmenu.ContextMenu;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.dataview.GridListDataView;
-import com.vaadin.flow.component.grid.dnd.GridDropMode;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.renderer.LitRenderer;
-import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.spring.annotation.UIScope;
-
-@UIScope
+@Scope(SCOPE_PROTOTYPE)
 @Component
 @WindowContent(value = "grid", title = "Two Grids", left = "50%", top = "0px", width = "50%", height = "50%")
 public class GridWindow extends HorizontalLayout {
