@@ -14,7 +14,8 @@ import org.springframework.stereotype.Component;
 /**
  * Window management view listing all created windows, with possibility to open those
  */
-// I think we only need one instance of these
+// TODO I think we only need one instance of these,
+//  but at the moment this is not properly handled: it will open an empty window if navigating here again
 @UIScope
 @Component("windowManagerWindow")
 @WindowContent(value = "open-windows", title = "Windows Manager", left = "0%", top = "0px", width = "50%", height = "50%")
@@ -41,7 +42,7 @@ public class WindowManagerWindow extends Div {
         windowGrid.setHeight("300px");
         add(windowGrid);
 
-        // TODO update automatically with push (lower priority)
+        // TODO update the list automatically with push (lower priority)
         add(new Button("Refresh", VaadinIcon.REFRESH.create(), e -> {
             windowGrid.setItems(windowFactory.getOpenedWindows());
         }));
