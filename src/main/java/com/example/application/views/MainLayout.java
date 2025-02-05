@@ -1,5 +1,7 @@
 package com.example.application.views;
 
+import com.example.application.components.TopNav;
+import com.example.application.components.TopNavItem;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.html.Footer;
@@ -20,52 +22,42 @@ import org.vaadin.lineawesome.LineAwesomeIcon;
  */
 public class MainLayout extends AppLayout implements AfterNavigationObserver {
 
-    private H2 viewTitle;
-    private SideNav nav;
+    private TopNav nav;
     private WindowFactory windowFactory;
 
     public MainLayout(WindowFactory windows) {
         this.windowFactory = windows;
         setPrimarySection(Section.DRAWER);
-        addDrawerContent();
         addHeaderContent();
         setDrawerOpened(false);
     }
 
     private void addHeaderContent() {
-        DrawerToggle toggle = new DrawerToggle();
-        toggle.getElement().setAttribute("aria-label", "Menu toggle");
-
-        viewTitle = new H2();
-        viewTitle.addClassNames(LumoUtility.FontSize.LARGE,
-                LumoUtility.Margin.NONE);
-
-        addToNavbar(true, toggle, viewTitle);
-    }
-
-    private void addDrawerContent() {
-        H1 appName = new H1("MDI Demo");
+    	H1 appName = new H1("MDI Demo");
         appName.addClassNames(LumoUtility.FontSize.LARGE,
                 LumoUtility.Margin.NONE);
         Header header = new Header(appName);
 
-        Scroller scroller = new Scroller(createNavigation());
-
-        addToDrawer(header, scroller, createFooter());
+        addToNavbar(header, createNavigation(), createFooter());
     }
 
-    // TODO replace SideNav with top navigation for example with https://v-herd.eu/jonte-vaadinplus/top-nav or by Vaadin AppLayout (high priority)
+
     private SideNav createNavigation() {
-        // AppNav is not yet an official component.
-        // For documentation, visit https://github.com/vaadin/vcf-nav#readme
-        nav = new SideNav();
+        nav = new TopNav();
 
         windowFactory.getWindowNames().forEach(name -> {
-            SideNavItem win = new SideNavItem(windowFactory.getWindowTitle(name),
+        	TopNavItem win = new TopNavItem(windowFactory.getWindowTitle(name),
                     "windows/" + name, LineAwesomeIcon.WINDOWS.create());
             nav.addItem(win);
         });
-
+        TopNavItem base = new TopNavItem("Root menu");
+        TopNavItem item = new TopNavItem("Item");
+        TopNavItem item2 = new TopNavItem("Another item");
+        TopNavItem subItem = new TopNavItem("SubItem");
+        base.addItem(item);
+        base.addItem(item2);
+        item.addItem(subItem);
+        nav.addItem(base);
         return nav;
     }
 
@@ -82,11 +74,11 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
 
     @Override
     public void afterNavigation(AfterNavigationEvent event) {
+    	// TODO this probably doesn't make sense, with multiple windows highlighting becomes kind of useless 
         String path = event.getLocation().getPath();
-        viewTitle.setText(getCurrentPageTitle());
         nav.getChildren().forEach(comp -> {
-            if (comp instanceof SideNavItem) {
-                SideNavItem item = (SideNavItem) comp;
+            if (comp instanceof TopNavItem) {
+            	TopNavItem item = (TopNavItem) comp;
                 if (path.equals(item.getPath())) {
                     item.getElement().setAttribute("active", "true");
                 } else {
