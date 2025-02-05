@@ -1,14 +1,24 @@
 package com.example.application.views;
 
-import com.example.application.components.window.Window;
-import com.example.application.components.window.WindowData;
-import com.vaadin.flow.spring.annotation.VaadinSessionScope;
-import jakarta.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import com.example.application.components.window.Window;
+import com.example.application.components.window.WindowData;
+import com.vaadin.flow.shared.Registration;
+import com.vaadin.flow.spring.annotation.VaadinSessionScope;
+
+import jakarta.annotation.PostConstruct;
 
 @VaadinSessionScope
 @Component(value = "windowFactory")
@@ -18,6 +28,7 @@ public class WindowFactory {
     Map<String, List<WindowData>> windows = new HashMap<>();
     Map<String, String> windowNameToTitle = new HashMap<>();
     Map<String, Pair<WindowContent, Class<?>>> windowNameToContentAndClass = new HashMap<>();
+	private List<Consumer<Window>> eventHandlers = new ArrayList<Consumer<Window>>();
 
     public WindowFactory(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
@@ -61,8 +72,12 @@ public class WindowFactory {
                     contentAnnotation.width(), contentAnnotation.height());
 
             window.addOpenedChangeListener(event -> {
-                // TODO window was closed remove it from windows map (high priority)
-
+            	if (!event.isOpened()) {
+		            String name = windowNameToTitle.entrySet().stream().filter(e -> window.getHeaderTitle().equals(e.getValue())).findAny().map(Entry::getKey).orElse(null);
+		            Optional<WindowData> windowToRemove = windows.getOrDefault(name, List.of()).stream().filter(data -> data.getInstance().equals(window)).findAny();
+		            windowToRemove.ifPresent(data -> windows.get(name).remove(data));
+		            eventHandlers.forEach(e -> e.accept(null));
+            	}
             });
 
             List<WindowData> windowList = windows.computeIfAbsent(windowName, k -> new ArrayList<>());
@@ -70,6 +85,7 @@ public class WindowFactory {
             WindowData windowData = new WindowData(windowName, contentAnnotation.title(), windowNumber, window);
             windowList.add(windowData);
             window.add(content);
+            eventHandlers.forEach(e -> e.accept(window));
             return Optional.of(window);
         }
         return Optional.empty();
@@ -97,5 +113,17 @@ public class WindowFactory {
         List<WindowData> openedWindows = new ArrayList<>();
         windows.forEach((key, value) -> openedWindows.addAll(value));
         return openedWindows;
+    }
+    
+    // TODO improve listener, should probably replicate openedChangeEvent in functionality
+    public Registration addWindowCreatedListener(Consumer<Window> eventHandler) {
+    	eventHandlers.add(eventHandler);
+    	return new Registration() {
+			
+			@Override
+			public void remove() {
+				eventHandlers.remove(eventHandler);
+			}
+		};
     }
 }

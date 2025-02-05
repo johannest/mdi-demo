@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
  */
 // TODO I think we only need one instance of these,
 //  but at the moment this is not properly handled: it will open an empty window if navigating here again
+// 	we probably need create this one manually or add another parameter to the WindowContent to handle single instance windows
 @UIScope
 @Component("windowManagerWindow")
 @WindowContent(value = "open-windows", title = "Windows Manager", left = "0%", top = "0px", width = "50%", height = "50%")
@@ -33,8 +34,7 @@ public class WindowManagerWindow extends Div {
         windowGrid.addComponentColumn(windowData -> {
             Button openButton = new Button("Focus", e -> {
                 Window window = windowFactory.getWindow(windowData.getName(), windowData.getWindowNumber());
-                window.open();
-                // TODO bring the window to the TOP (high priority)
+                window.bringToFront();
             });
             openButton.setIcon(VaadinIcon.ARROW_FORWARD.create());
             return openButton;
@@ -42,10 +42,6 @@ public class WindowManagerWindow extends Div {
         windowGrid.setHeight("300px");
         add(windowGrid);
 
-        // TODO update the list automatically with push (lower priority)
-        add(new Button("Refresh", VaadinIcon.REFRESH.create(), e -> {
-            windowGrid.setItems(windowFactory.getOpenedWindows());
-        }));
     }
 
 
@@ -53,6 +49,7 @@ public class WindowManagerWindow extends Div {
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
         windowFactory = applicationContext.getBean(WindowFactory.class);
+        windowFactory.addWindowCreatedListener(e -> attachEvent.getUI().access(() -> windowGrid.setItems(windowFactory.getOpenedWindows())));
         windowGrid.setItems(windowFactory.getOpenedWindows());
     }
 }
