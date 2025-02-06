@@ -85,9 +85,8 @@ public class WindowFactory {
 
         window.addOpenedChangeListener(event -> {
             if (!event.isOpened()) {
-                String name = windowNameToTitle.entrySet().stream().filter(e -> window.getHeaderTitle().equals(e.getValue())).findAny().map(Entry::getKey).orElse(null);
-                Optional<WindowData> windowToRemove = windows.getOrDefault(name, List.of()).stream().filter(data -> data.getInstance().equals(window)).findAny();
-                windowToRemove.ifPresent(data -> windows.get(name).remove(data));
+                Optional<WindowData> windowToRemove = windows.getOrDefault(windowName, List.of()).stream().filter(data -> data.getInstance().equals(window)).findAny();
+                windowToRemove.ifPresent(data -> windows.get(windowName).remove(data));
                 eventHandlers.forEach(e -> e.accept(null));
             }
         });
