@@ -19,7 +19,7 @@ public @interface WindowContent {
     
     String left() default "0px";
 
-    String top() default "0px";
+    String top() default "50px";
 
     boolean showInManager() default true;
 
