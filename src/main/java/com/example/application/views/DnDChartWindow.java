@@ -1,5 +1,6 @@
 package com.example.application.views;
 
+import com.example.application.components.window.WindowContent;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.charts.Chart;
 import com.vaadin.flow.component.charts.model.ChartType;
@@ -21,7 +22,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 
 @Scope(SCOPE_PROTOTYPE)
 @Component
-@WindowContent(value = "chart", title = "Drag and drop chart", left = "10%", top = "0px", width = "40%")
+@WindowContent(value = "chart", title = "Drag and drop chart", left = "10%", top = "50px", width = "40%")
 public class DnDChartWindow extends VerticalLayout{
 
     public DnDChartWindow() {

@@ -1,4 +1,4 @@
-package com.example.application.views;
+package com.example.application.data;
 
 import java.util.List;
 import java.util.Optional;

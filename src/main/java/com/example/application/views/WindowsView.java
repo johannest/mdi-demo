@@ -1,6 +1,8 @@
 package com.example.application.views;
 
 import com.example.application.components.window.Window;
+import com.example.application.components.window.WindowFactory;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.router.*;
 
@@ -31,5 +33,11 @@ public class WindowsView extends Div
             Optional<Window> window = windowFactory.getWindow(win);
             window.ifPresent(Window::open);
         }
+    }
+
+    @Override
+    protected void onDetach(DetachEvent detachEvent) {
+        super.onDetach(detachEvent);
+        windowFactory.closeAllWindows();
     }
 }

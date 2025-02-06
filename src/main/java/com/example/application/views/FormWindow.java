@@ -1,5 +1,6 @@
 package com.example.application.views;
 
+import com.example.application.components.window.WindowContent;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -15,7 +16,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 
 @Scope(SCOPE_PROTOTYPE)
 @Component
-@WindowContent(value = "form", title = "Form", top = "50%", left = "10%", height = "50%", width = "90%")
+@WindowContent(value = "form", title = "Form", top = "50%", left = "10%", height = "50%", width = "75%")
 public class FormWindow extends FormLayout {
 
     DatePicker datePicker = new DatePicker("Date");

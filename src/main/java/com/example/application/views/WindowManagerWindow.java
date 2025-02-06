@@ -1,7 +1,9 @@
 package com.example.application.views;
 
 import com.example.application.components.window.Window;
+import com.example.application.components.window.WindowContent;
 import com.example.application.components.window.WindowData;
+import com.example.application.components.window.WindowFactory;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -14,12 +16,9 @@ import org.springframework.stereotype.Component;
 /**
  * Window management view listing all created windows, with possibility to open those
  */
-// TODO I think we only need one instance of these,
-//  but at the moment this is not properly handled: it will open an empty window if navigating here again
-// 	we probably need create this one manually or add another parameter to the WindowContent to handle single instance windows
 @UIScope
 @Component("windowManagerWindow")
-@WindowContent(value = "open-windows", title = "Windows Manager", left = "0%", top = "0px", width = "50%", height = "50%")
+@WindowContent(value = "open-windows", title = "Windows Manager", left = "0%", top = "50px", width = "33%", height = "33%", multiWindow = false, showInManager = false)
 public class WindowManagerWindow extends Div {
 
     private final Grid<WindowData> windowGrid;
@@ -34,9 +33,22 @@ public class WindowManagerWindow extends Div {
         windowGrid.addComponentColumn(windowData -> {
             Button openButton = new Button("Focus", e -> {
                 Window window = windowFactory.getWindow(windowData.getName(), windowData.getWindowNumber());
-                window.bringToFront();
+                if (window.isMini()) {
+                    window.restore();
+                    window.setPosition(windowData.getWindowContent().left(), windowData.getWindowContent().top());
+                } else {
+                    window.bringToFront();
+                }
             });
             openButton.setIcon(VaadinIcon.ARROW_FORWARD.create());
+            return openButton;
+        });
+        windowGrid.addComponentColumn(windowData -> {
+            Button openButton = new Button("Hide", e -> {
+                Window window = windowFactory.getWindow(windowData.getName(), windowData.getWindowNumber());
+                window.minimize();
+            });
+            openButton.setIcon(VaadinIcon.ARROW_DOWN.create());
             return openButton;
         });
         windowGrid.setHeight("300px");
@@ -49,7 +61,11 @@ public class WindowManagerWindow extends Div {
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
         windowFactory = applicationContext.getBean(WindowFactory.class);
-        windowFactory.addWindowCreatedListener(e -> attachEvent.getUI().access(() -> windowGrid.setItems(windowFactory.getOpenedWindows())));
+        windowFactory.addWindowCreatedListener(e -> {
+            if (windowGrid.isAttached()) {
+                attachEvent.getUI().access(() -> windowGrid.setItems(windowFactory.getOpenedWindows()));
+            }
+        });
         windowGrid.setItems(windowFactory.getOpenedWindows());
     }
 }

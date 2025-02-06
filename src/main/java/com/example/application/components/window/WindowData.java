@@ -7,12 +7,14 @@ public class WindowData {
     private String name;
     private String title;
     private Integer windowNumber;
+    private WindowContent windowContent;
     private Window instance;
 
-    public WindowData(String name, String title, Integer windowNumber, Window instance) {
+    public WindowData(String name, String title, Integer windowNumber, WindowContent windowContent, Window instance) {
         this.name = name;
         this.title = title;
         this.windowNumber = windowNumber;
+        this.windowContent = windowContent;
         this.instance = instance;
     }
 
@@ -38,6 +40,14 @@ public class WindowData {
 
     public void setWindowNumber(Integer windowNumber) {
         this.windowNumber = windowNumber;
+    }
+
+    public WindowContent getWindowContent() {
+        return windowContent;
+    }
+
+    public void setWindowContent(WindowContent windowContent) {
+        this.windowContent = windowContent;
     }
 
     public Window getInstance() {

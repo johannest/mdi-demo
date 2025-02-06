@@ -1,5 +1,9 @@
 package com.example.application.views;
 
+import com.example.application.components.window.WindowContent;
+import com.example.application.components.window.WindowFactory;
+import com.example.application.data.Person;
+import com.example.application.data.PersonService;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -13,7 +17,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 
 @Component
 @Scope(SCOPE_PROTOTYPE)
-@WindowContent(value = "persons", title = "Person List", top = "50%", left = "10%", height = "50%", width = "90%")
+@WindowContent(value = "persons", title = "Person List", top = "50%", left = "10%", height = "50%", width = "75%")
 public class PersonListWindow extends Div {
 
     private PersonService personService;

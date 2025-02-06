@@ -1,5 +1,6 @@
 package com.example.application.views;
 
+import com.example.application.components.window.WindowContent;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;

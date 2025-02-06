@@ -88,3 +88,8 @@ vaadin-dialog-overlay.window-mini h3.window-title {
     text-wrap: nowrap;
     overflow: hidden;
 }
+
+vaadin-app-layout::part(navbar) {
+    z-index: 1000;
+    transform: translate(0);
+}

@@ -258,4 +258,8 @@ public class Window extends Dialog {
                         }
                                 """);
     }
+
+    public boolean isMini() {
+        return mini;
+    }
 }

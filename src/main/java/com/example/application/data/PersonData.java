@@ -1,4 +1,4 @@
-package com.example.application.views;
+package com.example.application.data;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -7,8 +7,8 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.ApplicationScope;
 
-import com.example.application.views.Person.Address;
-import com.example.application.views.Person.MaritalStatus;
+import com.example.application.data.Person.Address;
+import com.example.application.data.Person.MaritalStatus;
 
 @Component
 @ApplicationScope

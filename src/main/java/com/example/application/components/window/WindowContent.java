@@ -1,4 +1,4 @@
-package com.example.application.views;
+package com.example.application.components.window;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -19,5 +19,9 @@ public @interface WindowContent {
     
     String left() default "0px";
 
-    String top() default "0px"; 
+    String top() default "0px";
+
+    boolean showInManager() default true;
+
+    boolean multiWindow() default true;
 }

@@ -1,24 +1,15 @@
-package com.example.application.views;
+package com.example.application.components.window;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Consumer;
-
+import com.vaadin.flow.shared.Registration;
+import com.vaadin.flow.spring.annotation.VaadinSessionScope;
+import jakarta.annotation.PostConstruct;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
-import com.example.application.components.window.Window;
-import com.example.application.components.window.WindowData;
-import com.vaadin.flow.shared.Registration;
-import com.vaadin.flow.spring.annotation.VaadinSessionScope;
-
-import jakarta.annotation.PostConstruct;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 @VaadinSessionScope
 @Component(value = "windowFactory")
@@ -56,7 +47,7 @@ public class WindowFactory {
     }
 
     /**
-     * Create Window for the contentAnnotation and the content class
+     * Returns Window for the contentAnnotation and the content class
      *
      * @param contentAnnotationAndClass window definition in the annotation
      * @return newly created Window instance
@@ -67,30 +58,47 @@ public class WindowFactory {
             com.vaadin.flow.component.Component content = (com.vaadin.flow.component.Component)
                     applicationContext.getBean(contentAnnotationAndClass.getSecond());
             String windowName = contentAnnotation.value();
-            Window window = new Window(contentAnnotation.title(),
-                    contentAnnotation.left(), contentAnnotation.top(),
-                    contentAnnotation.width(), contentAnnotation.height());
-
-            window.addOpenedChangeListener(event -> {
-            	if (!event.isOpened()) {
-		            String name = windowNameToTitle.entrySet().stream().filter(e -> window.getHeaderTitle().equals(e.getValue())).findAny().map(Entry::getKey).orElse(null);
-		            Optional<WindowData> windowToRemove = windows.getOrDefault(name, List.of()).stream().filter(data -> data.getInstance().equals(window)).findAny();
-		            windowToRemove.ifPresent(data -> windows.get(name).remove(data));
-		            eventHandlers.forEach(e -> e.accept(null));
-            	}
-            });
-
             List<WindowData> windowList = windows.computeIfAbsent(windowName, k -> new ArrayList<>());
-            int windowNumber = windowList.size() + 1;
-            WindowData windowData = new WindowData(windowName, contentAnnotation.title(), windowNumber, window);
-            windowList.add(windowData);
-            window.add(content);
-            eventHandlers.forEach(e -> e.accept(window));
-            return Optional.of(window);
+
+            if (windowList.isEmpty() || contentAnnotation.multiWindow()) {
+                // this window does not yet exist, or it is multi window
+                Window window = createNewWindowInstance(contentAnnotation, windowList, windowName, content);
+                return Optional.of(window);
+            } else {
+                // only one instance of this window is allowed, just return it
+                Window instance = windowList.get(0).getInstance();
+                if (instance.isAttached()) {
+                    return Optional.of(instance);
+                } else {
+                    windowList.remove(0);
+                    return Optional.of(createNewWindowInstance(contentAnnotation, windowList, windowName, content));
+                }
+            }
         }
         return Optional.empty();
     }
 
+    private Window createNewWindowInstance(WindowContent contentAnnotation, List<WindowData> windowList, String windowName, com.vaadin.flow.component.Component content) {
+        Window window = new Window(contentAnnotation.title(),
+                contentAnnotation.left(), contentAnnotation.top(),
+                contentAnnotation.width(), contentAnnotation.height());
+
+        window.addOpenedChangeListener(event -> {
+            if (!event.isOpened()) {
+                String name = windowNameToTitle.entrySet().stream().filter(e -> window.getHeaderTitle().equals(e.getValue())).findAny().map(Entry::getKey).orElse(null);
+                Optional<WindowData> windowToRemove = windows.getOrDefault(name, List.of()).stream().filter(data -> data.getInstance().equals(window)).findAny();
+                windowToRemove.ifPresent(data -> windows.get(name).remove(data));
+                eventHandlers.forEach(e -> e.accept(null));
+            }
+        });
+
+        int windowNumber = windowList.size() + 1;
+        WindowData windowData = new WindowData(windowName, contentAnnotation.title(), windowNumber, contentAnnotation, window);
+        windowList.add(windowData);
+        window.add(content);
+        eventHandlers.forEach(e -> e.accept(window));
+        return window;
+    }
 
     public Set<String> getWindowNames() {
         return windowNameToTitle.keySet();
@@ -111,7 +119,9 @@ public class WindowFactory {
 
     public List<WindowData> getOpenedWindows() {
         List<WindowData> openedWindows = new ArrayList<>();
-        windows.forEach((key, value) -> openedWindows.addAll(value));
+        windows.forEach((key, value) -> {
+            openedWindows.addAll(value.stream().filter(windowData -> windowData.getWindowContent().showInManager()).toList());
+        });
         return openedWindows;
     }
     
@@ -125,5 +135,15 @@ public class WindowFactory {
 				eventHandlers.remove(eventHandler);
 			}
 		};
+    }
+
+    public void closeAllWindows() {
+        // TODO make sure all references are cleaned from memory
+        List<WindowData> openedWindows = new ArrayList<>(getOpenedWindows());
+        openedWindows.forEach(windowData -> {
+            windowData.getInstance().close();
+        });
+        eventHandlers.clear();
+        windows = new HashMap<>();
     }
 }
