@@ -16,7 +16,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 
 @Scope(SCOPE_PROTOTYPE)
 @Component
-@WindowContent(value = "grid", title = "Two Grids", left = "50%", top = "0px", width = "50%", height = "50%")
+@WindowContent(value = "grid", title = "Two Grids", left = "50%", top = "50px", width = "50%", height = "50%")
 public class GridWindow extends HorizontalLayout {
 
     public GridWindow() {
