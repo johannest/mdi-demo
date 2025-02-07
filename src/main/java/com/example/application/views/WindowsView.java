@@ -1,6 +1,6 @@
 package com.example.application.views;
 
-import com.example.application.components.window.Window;
+import com.example.application.components.window.WindowAndContent;
 import com.example.application.components.window.WindowFactory;
 import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.html.Div;
@@ -30,8 +30,8 @@ public class WindowsView extends Div
     public void afterNavigation(AfterNavigationEvent event) {
         String[] wins = param.split("/");
         for (String win : wins) {
-            Optional<Window> window = windowFactory.getWindow(win);
-            window.ifPresent(Window::open);
+            Optional<WindowAndContent> windowAndContent = windowFactory.getOrCreateWindow(win);
+            windowAndContent.ifPresent(pair -> pair.window().open());
         }
     }
 

@@ -23,5 +23,7 @@ public @interface WindowContent {
 
     boolean showInManager() default true;
 
+    boolean showInMenu() default true;
+
     boolean multiWindow() default true;
 }

@@ -1,4 +1,4 @@
-package com.example.application.views;
+package com.example.application.data;
 
 public class Department {
     private int id;

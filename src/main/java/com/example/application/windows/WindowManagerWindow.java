@@ -1,4 +1,4 @@
-package com.example.application.views;
+package com.example.application.windows;
 
 import com.example.application.components.window.Window;
 import com.example.application.components.window.WindowContent;
@@ -32,7 +32,7 @@ public class WindowManagerWindow extends Div {
         windowGrid.addColumn(WindowData::getWindowNumber).setHeader("Window Number");
         windowGrid.addComponentColumn(windowData -> {
             Button openButton = new Button("Focus", e -> {
-                Window window = windowFactory.getWindow(windowData.getName(), windowData.getWindowNumber());
+                Window window = windowFactory.getOrCreateWindow(windowData.getName(), windowData.getWindowNumber());
                 if (window.isMini()) {
                     window.restore();
                     window.setPosition(windowData.getWindowContent().left(), windowData.getWindowContent().top());
@@ -45,7 +45,7 @@ public class WindowManagerWindow extends Div {
         });
         windowGrid.addComponentColumn(windowData -> {
             Button openButton = new Button("Hide", e -> {
-                Window window = windowFactory.getWindow(windowData.getName(), windowData.getWindowNumber());
+                Window window = windowFactory.getOrCreateWindow(windowData.getName(), windowData.getWindowNumber());
                 window.minimize();
             });
             openButton.setIcon(VaadinIcon.ARROW_DOWN.create());

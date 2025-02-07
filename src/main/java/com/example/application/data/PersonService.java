@@ -1,15 +1,15 @@
 package com.example.application.data;
 
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.springframework.stereotype.Service;
-
 @Service
 public class PersonService {
-    private PersonData personData = new PersonData();
+    private PersonData personData;
 
     public PersonService(PersonData personData) {
         this.personData = personData;
@@ -57,5 +57,10 @@ public class PersonService {
 
     public List<Person> fetchAll() {
         return personData.getPersons();
+    }
+
+    public void save(Person person) {
+        personData.removePerson(person.getId());
+        personData.addPerson(person);
     }
 }

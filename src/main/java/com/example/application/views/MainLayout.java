@@ -43,9 +43,11 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
         nav = new TopNav();
 
         windowFactory.getWindowNames().forEach(name -> {
-        	TopNavItem win = new TopNavItem(windowFactory.getWindowTitle(name),
-                    "windows/" + name, LineAwesomeIcon.WINDOWS.create());
-            nav.addItem(win);
+            if (windowFactory.showWindowInMenu(name)) {
+                TopNavItem win = new TopNavItem(windowFactory.getWindowTitle(name),
+                        "windows/" + name, LineAwesomeIcon.WINDOWS.create());
+                nav.addItem(win);
+            }
         });
         TopNavItem base = new TopNavItem("Root menu");
         TopNavItem item = new TopNavItem("Item");

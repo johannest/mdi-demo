@@ -1,4 +1,4 @@
-package com.example.application.views;
+package com.example.application.windows;
 
 import com.example.application.components.window.WindowContent;
 import com.vaadin.flow.component.Text;

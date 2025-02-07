@@ -1,25 +1,25 @@
 package com.example.application.components.window;
 
 import com.vaadin.flow.shared.Registration;
-import com.vaadin.flow.spring.annotation.VaadinSessionScope;
+import com.vaadin.flow.spring.annotation.UIScope;
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.function.Consumer;
 
-@VaadinSessionScope
+@UIScope
 @Component(value = "windowFactory")
 public class WindowFactory {
 
     private final ApplicationContext applicationContext;
-    Map<String, List<WindowData>> windows = new HashMap<>();
-    Map<String, String> windowNameToTitle = new HashMap<>();
-    Map<String, Pair<WindowContent, Class<?>>> windowNameToContentAndClass = new HashMap<>();
-	private List<Consumer<Window>> eventHandlers = new ArrayList<Consumer<Window>>();
+    private final Map<String, List<WindowData>> windows = new HashMap<>();
+    private final Map<String, String> windowNameToTitle = new HashMap<>();
+    private final Map<String, Pair<WindowContent, Class<?>>> windowNameToContentAndClass = new HashMap<>();
+    private final Map<Object, Window> beanToWindow = new HashMap<>();
+	private final List<Consumer<Window>> eventHandlers = new ArrayList<Consumer<Window>>();
 
     public WindowFactory(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
@@ -52,7 +52,7 @@ public class WindowFactory {
      * @param contentAnnotationAndClass window definition in the annotation
      * @return newly created Window instance
      */
-    private Optional<Window> createWindow(Pair<WindowContent, Class<?>> contentAnnotationAndClass) {
+    private Optional<WindowAndContent> createWindow(Pair<WindowContent, Class<?>> contentAnnotationAndClass) {
         if (contentAnnotationAndClass != null) {
             WindowContent contentAnnotation = contentAnnotationAndClass.getFirst();
             com.vaadin.flow.component.Component content = (com.vaadin.flow.component.Component)
@@ -63,15 +63,15 @@ public class WindowFactory {
             if (windowList.isEmpty() || contentAnnotation.multiWindow()) {
                 // this window does not yet exist, or it is multi window
                 Window window = createNewWindowInstance(contentAnnotation, windowList, windowName, content);
-                return Optional.of(window);
+                return Optional.of(new WindowAndContent(window, content));
             } else {
                 // only one instance of this window is allowed, just return it
                 Window instance = windowList.get(0).getInstance();
                 if (instance.isAttached()) {
-                    return Optional.of(instance);
+                    return Optional.of(new WindowAndContent(instance, content));
                 } else {
                     windowList.remove(0);
-                    return Optional.of(createNewWindowInstance(contentAnnotation, windowList, windowName, content));
+                    return Optional.of(new WindowAndContent(createNewWindowInstance(contentAnnotation, windowList, windowName, content), content));
                 }
             }
         }
@@ -107,12 +107,12 @@ public class WindowFactory {
         return windowNameToTitle.get(windowName);
     }
 
-    public Window getWindow(String name, Integer windowNumber) {
+    public Window getOrCreateWindow(String name, Integer windowNumber) {
         Optional<WindowData> any = windows.get(name).stream().filter(windowData -> windowData.getWindowNumber().equals(windowNumber)).findAny();
         return any.map(WindowData::getInstance).orElse(null);
     }
 
-    public Optional<Window> getWindow(String name) {
+    public Optional<WindowAndContent> getOrCreateWindow(String name) {
         return createWindow(windowNameToContentAndClass.get(name));
     }
 
@@ -143,6 +143,39 @@ public class WindowFactory {
             windowData.getInstance().close();
         });
         eventHandlers.clear();
-        windows = new HashMap<>();
+        windows.clear();
+    }
+
+    /**
+     * Should this window be listed in navigation menu
+     *
+     * @param name window name
+     * @return true if it should be shown in navigation menu
+     */
+    public boolean showWindowInMenu(String name) {
+        return windowNameToContentAndClass.get(name).getFirst().showInMenu();
+    }
+
+    /**
+     * Way to connect bean that is being in edited to its window instance
+     *
+     * @param bean any Java bean being edited in the window
+     * @param window actual Window object where the bean is edited
+     */
+    public void addBeanToWindow(Object bean, Window window) {
+        beanToWindow.put(bean, window);
+    }
+
+    /**
+     * Close the window where the given bean was edited
+     *
+     * @param bean bean that was edited
+     */
+    public void closeWindowOfBean(Object bean) {
+        Window window = beanToWindow.get(bean);
+        if (window != null) {
+            window.close();
+        }
+        beanToWindow.remove(bean);
     }
 }

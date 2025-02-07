@@ -127,6 +127,10 @@ public class Person implements Cloneable {
         this.email = email;
     }
 
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
+
     @Override
     public int hashCode() {
         return id;

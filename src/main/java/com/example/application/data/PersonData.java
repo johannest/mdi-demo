@@ -1,14 +1,14 @@
 package com.example.application.data;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.example.application.data.Person.Address;
+import com.example.application.data.Person.MaritalStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.ApplicationScope;
 
-import com.example.application.data.Person.Address;
-import com.example.application.data.Person.MaritalStatus;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 @ApplicationScope
@@ -62,13 +62,13 @@ public class PersonData {
             "965-398-621", "974-754-449", "987-173-689" };
     private static final String[] cities = new String[] { "New York", "Washington" };
 
-    private final List<Person> people = new ArrayList<>();
+    private final Map<Integer, Person> people = new HashMap<>();
 
     public List<Person> getPersons() {
         if (people.isEmpty()) {
             for (int i = 91; i <= 199; i++) {
                 final int age = ages[i % ages.length];
-                people.add(new Person(i, names[i % names.length],
+                people.put(i, new Person(i, names[i % names.length],
                         surnames[i % surnames.length], age,
                         new Address(numbers[i % numbers.length],
                                 cities[i % cities.length]),
@@ -79,6 +79,18 @@ public class PersonData {
                                 i % LocalDate.now().getDayOfYear())));
             }
         }
-        return people;
+        return people.values().stream().toList();
+    }
+
+    public Person getPerson(int id) {
+        return people.get(id);
+    }
+
+    public void removePerson(int id) {
+        people.remove(id);
+    }
+
+    public void addPerson(Person person) {
+        people.put(person.getId(), person);
     }
 }
