@@ -82,6 +82,7 @@ public class WindowFactory {
     }
 
     private Window createNewWindowInstance(WindowContent contentAnnotation, List<WindowData> windowList, String windowName, com.vaadin.flow.component.Component content) {
+    	int windowNumber = windowList.stream().map(WindowData::getWindowNumber).max(Integer::compare).map(e -> e + 1).orElse(1);
         Window window = new Window(contentAnnotation.title(),
                 contentAnnotation.left(), contentAnnotation.top(),
                 contentAnnotation.width(), contentAnnotation.height());
@@ -94,7 +95,6 @@ public class WindowFactory {
             }
         });
 
-        int windowNumber = windowList.size() + 1;
         WindowData windowData = new WindowData(windowName, contentAnnotation.title(), windowNumber, contentAnnotation, window);
         windowList.add(windowData);
         window.add(content);
