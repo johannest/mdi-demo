@@ -10,6 +10,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.spring.annotation.UIScope;
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 @UIScope
 @Component("windowManagerWindow")
 @WindowContent(value = "open-windows", title = "Windows Manager", left = "0%", top = "50px", width = "33%", height = "33%", multiWindow = false, showInManager = false)
+@RolesAllowed({"ADMIN","USER"})
 public class WindowManagerWindow extends Div {
 
     private final Grid<WindowData> windowGrid;

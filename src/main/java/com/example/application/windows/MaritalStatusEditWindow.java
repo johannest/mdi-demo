@@ -10,6 +10,7 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.listbox.ListBox;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 @Scope(SCOPE_PROTOTYPE)
 @Component
 @WindowContent(value = WINDOW_NAME, title = "Select Marital Status", left = "50%", width = "300x", height = "210px", showInMenu = false)
+@PermitAll
 public class MaritalStatusEditWindow extends Div {
 
     public static final String WINDOW_NAME = "marital-status";

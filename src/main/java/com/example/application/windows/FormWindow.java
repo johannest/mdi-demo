@@ -7,6 +7,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 @Scope(SCOPE_PROTOTYPE)
 @Component
 @WindowContent(value = "form", title = "Form", top = "50%", left = "10%", height = "50%", width = "75%")
+@PermitAll
 public class FormWindow extends FormLayout {
 
     DatePicker datePicker = new DatePicker("Date");

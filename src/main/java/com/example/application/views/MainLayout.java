@@ -11,26 +11,33 @@ import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.spring.security.AuthenticationContext;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import jakarta.annotation.security.PermitAll;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 /**
  * The main view is a top-level placeholder for other views.
  */
+@PermitAll
 public class MainLayout extends AppLayout implements AfterNavigationObserver {
-
+    private Logger logger = LoggerFactory.getLogger(MainLayout.class);
     private TopNav nav;
     private WindowFactory windowFactory;
+    private final AuthenticationContext authenticationContext;
 
-    public MainLayout(WindowFactory windows) {
+    public MainLayout(WindowFactory windows, AuthenticationContext authenticationContext) {
         this.windowFactory = windows;
+        this.authenticationContext = authenticationContext;
         setPrimarySection(Section.DRAWER);
         addHeaderContent();
         setDrawerOpened(false);
     }
 
     private void addHeaderContent() {
-    	H1 appName = new H1("MDI Demo");
+        H1 appName = new H1("MDI Demo");
         appName.addClassNames(LumoUtility.FontSize.LARGE,
                 LumoUtility.Margin.NONE);
         Header header = new Header(appName);
@@ -44,15 +51,21 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
 
         windowFactory.getWindowNames().forEach(name -> {
             if (windowFactory.showWindowInMenu(name)) {
-                TopNavItem win = new TopNavItem(windowFactory.getWindowTitle(name),
-                        "windows/" + name, LineAwesomeIcon.WINDOWS.create());
-                nav.addItem(win);
+                if (windowFactory.isWindowAllowed(authenticationContext, name)) {
+                    TopNavItem win = new TopNavItem(windowFactory.getWindowTitle(name),
+                            "windows/" + name, LineAwesomeIcon.WINDOWS.create());
+                    nav.addItem(win);
+                    logger.info("Added window {} to top nav", name);
+                } else {
+                    logger.info("Windows {} not listed in the navigation due to the security constraint", name);
+                }
             }
         });
         TopNavItem base = new TopNavItem("Root menu");
         TopNavItem item = new TopNavItem("Item");
         TopNavItem item2 = new TopNavItem("Another item");
         TopNavItem subItem = new TopNavItem("SubItem");
+        subItem.addClassNames("sub");
         base.addItem(item);
         base.addItem(item2);
         item.addItem(subItem);
@@ -73,11 +86,11 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
 
     @Override
     public void afterNavigation(AfterNavigationEvent event) {
-    	// TODO this probably doesn't make sense, with multiple windows highlighting becomes kind of useless 
+        // TODO this probably doesn't make sense, with multiple windows highlighting becomes kind of useless
         String path = event.getLocation().getPath();
         nav.getChildren().forEach(comp -> {
             if (comp instanceof TopNavItem) {
-            	TopNavItem item = (TopNavItem) comp;
+                TopNavItem item = (TopNavItem) comp;
                 if (path.equals(item.getPath())) {
                     item.getElement().setAttribute("active", "true");
                 } else {

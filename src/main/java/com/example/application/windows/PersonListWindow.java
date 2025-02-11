@@ -15,6 +15,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 @Component
 @Scope(SCOPE_PROTOTYPE)
 @WindowContent(value = "persons", title = "Person List", top = "20%", left = "10%", height = "50%", width = "75%")
+@RolesAllowed("ADMIN")
 public class PersonListWindow extends Div {
 
     private PersonService personService;

@@ -2,7 +2,10 @@ package com.example.application.components.window;
 
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.UIScope;
+import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
@@ -19,7 +22,7 @@ public class WindowFactory {
     private final Map<String, String> windowNameToTitle = new HashMap<>();
     private final Map<String, Pair<WindowContent, Class<?>>> windowNameToContentAndClass = new HashMap<>();
     private final Map<Object, Window> beanToWindow = new HashMap<>();
-	private final List<Consumer<Window>> eventHandlers = new ArrayList<Consumer<Window>>();
+    private final List<Consumer<Window>> eventHandlers = new ArrayList<Consumer<Window>>();
 
     public WindowFactory(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
@@ -123,17 +126,17 @@ public class WindowFactory {
         });
         return openedWindows;
     }
-    
+
     // TODO improve listener, should probably replicate openedChangeEvent in functionality
     public Registration addWindowCreatedListener(Consumer<Window> eventHandler) {
-    	eventHandlers.add(eventHandler);
-    	return new Registration() {
-			
-			@Override
-			public void remove() {
-				eventHandlers.remove(eventHandler);
-			}
-		};
+        eventHandlers.add(eventHandler);
+        return new Registration() {
+
+            @Override
+            public void remove() {
+                eventHandlers.remove(eventHandler);
+            }
+        };
     }
 
     public void closeAllWindows() {
@@ -159,7 +162,7 @@ public class WindowFactory {
     /**
      * Way to connect bean that is being in edited to its window instance
      *
-     * @param bean any Java bean being edited in the window
+     * @param bean   any Java bean being edited in the window
      * @param window actual Window object where the bean is edited
      */
     public void addBeanToWindow(Object bean, Window window) {
@@ -177,5 +180,49 @@ public class WindowFactory {
             window.close();
         }
         beanToWindow.remove(bean);
+    }
+
+    /**
+     * Lists possible roles in the @RolesAllowed annotation
+     *
+     * @param name window name
+     * @return all roles defined in possible @RolesAllowed annotation
+     */
+    public List<String> rolesAllowed(String name) {
+        List<String> roles = new ArrayList<>();
+        Pair<WindowContent, Class<?>> windowContentClassPair = windowNameToContentAndClass.get(name);
+        if (windowContentClassPair != null) {
+            RolesAllowed annotation = windowContentClassPair.getSecond().getAnnotation(RolesAllowed.class);
+            if (annotation != null) {
+                roles.addAll(Arrays.stream(annotation.value()).toList());
+            }
+        }
+        return roles;
+    }
+
+    /**
+     * Check whether the Window is annotated @PermitAll annotation
+     *
+     * @param name window name
+     * @return true if window has an @PermitAll annotation
+     */
+    public boolean isPermitAll(String name) {
+        Pair<WindowContent, Class<?>> windowContentClassPair = windowNameToContentAndClass.get(name);
+        if (windowContentClassPair != null) {
+            PermitAll annotation = windowContentClassPair.getSecond().getAnnotation(PermitAll.class);
+            return annotation != null;
+        }
+        return false;
+    }
+
+    public boolean isWindowAllowed(AuthenticationContext authenticationContext, String windowName) {
+        if (isPermitAll(windowName)) {
+            return true;
+        }
+        List<String> rolesAllowed = rolesAllowed(windowName);
+        if (!rolesAllowed.isEmpty()) {
+            return authenticationContext.hasAnyRole(rolesAllowed);
+        }
+        return false;
     }
 }

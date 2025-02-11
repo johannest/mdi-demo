@@ -2,3 +2,4 @@
 /frontend/generated/
 /.idea/
 /.java-version
+/node_modules/

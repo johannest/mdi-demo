@@ -5,6 +5,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.renderer.LitRenderer;
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 @Scope(SCOPE_PROTOTYPE)
 @Component
 @WindowContent(value = "grid", title = "Two Grids", left = "50%", top = "50px", width = "50%", height = "50%")
+@RolesAllowed("USER")
 public class GridWindow extends HorizontalLayout {
 
     public GridWindow() {
