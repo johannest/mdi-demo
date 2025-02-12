@@ -48,6 +48,7 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
 
     private SideNav createNavigation() {
         nav = new TopNav();
+        nav.setWidth("100%");
 
         windowFactory.getWindowNames().forEach(name -> {
             if (windowFactory.showWindowInMenu(name)) {
