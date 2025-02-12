@@ -48,7 +48,7 @@ public class PersonListWindow extends Div {
             button.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
             button.setIcon(VaadinIcon.EDIT.create());
             button.addClickListener(event -> {
-                Optional<WindowAndContent> windowAndContent = windowFactory.getOrCreateWindow(MaritalStatusEditWindow.WINDOW_NAME);
+                Optional<WindowAndContent> windowAndContent = windowFactory.getWindowInstance(MaritalStatusEditWindow.WINDOW_NAME);
                 windowAndContent.ifPresent(windowNContent -> {
                     createEditMaritalStatusEditWindow(person, windowNContent);
                 });
