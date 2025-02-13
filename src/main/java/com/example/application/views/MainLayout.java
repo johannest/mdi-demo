@@ -111,6 +111,7 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
     @Override
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
+        // very simple browser window close confirmation
         var js = """
                 window.addEventListener('beforeunload', (evt) => {
                     const msg = 'foo';
