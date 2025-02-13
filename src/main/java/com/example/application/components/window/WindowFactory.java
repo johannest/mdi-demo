@@ -1,20 +1,29 @@
 package com.example.application.components.window;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.data.util.Pair;
+
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.shared.Registration;
+import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import com.vaadin.flow.spring.security.AuthenticationContext;
+
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
-import org.springframework.context.ApplicationContext;
-import org.springframework.data.util.Pair;
-import org.springframework.stereotype.Component;
-
-import java.util.*;
-import java.util.function.Consumer;
 
 @UIScope
-@Component(value = "windowFactory")
+@SpringComponent(value = "windowFactory")
 public class WindowFactory {
 
     private final ApplicationContext applicationContext;
@@ -23,6 +32,7 @@ public class WindowFactory {
     private final Map<String, Pair<WindowContent, Class<?>>> windowNameToContentAndClass = new HashMap<>();
     private final Map<Object, Window> beanToWindow = new HashMap<>();
     private final List<Consumer<Window>> eventHandlers = new ArrayList<Consumer<Window>>();
+    private final Map<Component, WindowData> viewToWindowData = new HashMap<>();
 
     public WindowFactory(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
@@ -58,7 +68,7 @@ public class WindowFactory {
     private Optional<WindowAndContent> createWindow(Pair<WindowContent, Class<?>> contentAnnotationAndClass) {
         if (contentAnnotationAndClass != null) {
             WindowContent contentAnnotation = contentAnnotationAndClass.getFirst();
-            com.vaadin.flow.component.Component content = (com.vaadin.flow.component.Component)
+            Component content = (Component)
                     applicationContext.getBean(contentAnnotationAndClass.getSecond());
             String windowName = contentAnnotation.value();
             List<WindowData> windowList = windows.computeIfAbsent(windowName, k -> new ArrayList<>());
@@ -81,7 +91,7 @@ public class WindowFactory {
         return Optional.empty();
     }
 
-    private Window createNewWindowInstance(WindowContent contentAnnotation, List<WindowData> windowList, String windowName, com.vaadin.flow.component.Component content) {
+    private Window createNewWindowInstance(WindowContent contentAnnotation, List<WindowData> windowList, String windowName, Component content) {
     	int windowNumber = windowList.stream().map(WindowData::getWindowNumber).max(Integer::compare).map(e -> e + 1).orElse(1);
         Window window = new Window(contentAnnotation.title(),
                 contentAnnotation.left(), contentAnnotation.top(),
@@ -98,6 +108,7 @@ public class WindowFactory {
         WindowData windowData = new WindowData(windowName, contentAnnotation.title(), windowNumber, contentAnnotation, window);
         windowList.add(windowData);
         window.add(content);
+        viewToWindowData.put(content, windowData);
         eventHandlers.forEach(e -> e.accept(window));
         return window;
     }
@@ -224,5 +235,9 @@ public class WindowFactory {
             return authenticationContext.hasAnyRole(rolesAllowed);
         }
         return false;
+    }
+    
+    public Optional<WindowData> getWindowDataForView(Component view) {
+    	return Optional.ofNullable(viewToWindowData.get(view));
     }
 }

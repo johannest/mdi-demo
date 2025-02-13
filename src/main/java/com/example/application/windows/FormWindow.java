@@ -1,6 +1,9 @@
 package com.example.application.windows;
 
 import com.example.application.components.window.WindowContent;
+import com.example.application.components.window.WindowData;
+import com.example.application.components.window.WindowFactory;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -12,6 +15,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
@@ -24,9 +28,11 @@ public class FormWindow extends FormLayout {
     DatePicker datePicker = new DatePicker("Date");
     ComboBox<String> comboBox = new ComboBox<>("Combo");
     TextField textField = new TextField("Text");
+	private WindowFactory factory;
 
-    public FormWindow() {
-        Binder<Bean> binder = new Binder<>();
+    public FormWindow(WindowFactory factory) {
+        this.factory = factory;
+		Binder<Bean> binder = new Binder<>();
         comboBox.setItems("One", "Two", "Three");
         binder.forField(datePicker).bind(Bean::getDate, Bean::setDate);
         binder.forField(comboBox).bind(Bean::getNumber, Bean::setNumber);
@@ -35,6 +41,14 @@ public class FormWindow extends FormLayout {
             Notification.show(e.getValue().toString());
         });
         add(datePicker, comboBox, textField);
+        add(new Button("Show window details", e -> showWindowDetails()));
+    }
+    
+    private void showWindowDetails() {
+    	Optional<WindowData> windowData = factory.getWindowDataForView(this);
+    	windowData.ifPresent(e -> {
+    		Notification.show("WindowName: " + e.getName() + " Number: " + e.getWindowNumber());
+    	});
     }
 
     public class Bean {
