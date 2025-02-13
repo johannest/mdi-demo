@@ -3,6 +3,7 @@ package com.example.application.views;
 import com.example.application.components.TopNav;
 import com.example.application.components.TopNavItem;
 import com.example.application.components.window.WindowFactory;
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.html.Footer;
 import com.vaadin.flow.component.html.H1;
@@ -105,5 +106,18 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        super.onAttach(attachEvent);
+        var js = """
+                window.addEventListener('beforeunload', (evt) => {
+                    const msg = 'foo';
+                    (evt || window.event).returnValue = msg;
+                    return msg;
+                  });
+                """;
+        attachEvent.getUI().getElement().executeJs(js);
     }
 }
