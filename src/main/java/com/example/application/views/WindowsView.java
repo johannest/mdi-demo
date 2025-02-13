@@ -38,8 +38,8 @@ public class WindowsView extends Div
     public void afterNavigation(AfterNavigationEvent event) {
         String[] wins = param.split("/");
         for (String win : wins) {
-            if (windowFactory.isWindowAllowed(authenticationContext, win)) {
-                Optional<WindowAndContent> windowAndContent = windowFactory.getOrCreateWindow(win);
+            if (windowFactory.isWindowAllowed(win)) {
+                Optional<WindowAndContent> windowAndContent = windowFactory.getWindowInstance(win);
                 // check RolesAllowed
                 windowAndContent.ifPresent(pair -> pair.window().open());
             } else if (win != null && !win.isEmpty()) {

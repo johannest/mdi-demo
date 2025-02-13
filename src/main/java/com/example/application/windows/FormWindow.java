@@ -10,7 +10,10 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import elemental.json.JsonObject;
 import jakarta.annotation.security.PermitAll;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +27,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 @WindowContent(value = "form", title = "Form", top = "50%", left = "10%", height = "50%", width = "75%")
 @PermitAll
 public class FormWindow extends FormLayout {
-
+    private Logger logger = LoggerFactory.getLogger(FormWindow.class);
     DatePicker datePicker = new DatePicker("Date");
     ComboBox<String> comboBox = new ComboBox<>("Combo");
     TextField textField = new TextField("Text");
@@ -42,6 +45,16 @@ public class FormWindow extends FormLayout {
         });
         add(datePicker, comboBox, textField);
         add(new Button("Show window details", e -> showWindowDetails()));
+
+        // demonstrates how to capture keydown event on DatePicker
+        datePicker.getElement().addEventListener("keydown", event -> {
+            JsonObject eventData = event.getEventData();
+            if (eventData != null) {
+                String key = eventData.getString("event.key");
+                String keyCode = eventData.getString("event.code");
+                logger.info("Key: {} Code: {}", key, keyCode);
+            }
+        }).addEventData("event.key").addEventData("event.code");
     }
     
     private void showWindowDetails() {

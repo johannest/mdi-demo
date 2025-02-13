@@ -3,6 +3,7 @@ package com.example.application.views;
 import com.example.application.components.TopNav;
 import com.example.application.components.TopNavItem;
 import com.example.application.components.window.WindowFactory;
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.html.Footer;
 import com.vaadin.flow.component.html.H1;
@@ -48,10 +49,11 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
 
     private SideNav createNavigation() {
         nav = new TopNav();
+        nav.setWidth("100%");
 
         windowFactory.getWindowNames().forEach(name -> {
             if (windowFactory.showWindowInMenu(name)) {
-                if (windowFactory.isWindowAllowed(authenticationContext, name)) {
+                if (windowFactory.isWindowAllowed(name)) {
                     TopNavItem win = new TopNavItem(windowFactory.getWindowTitle(name),
                             "windows/" + name, LineAwesomeIcon.WINDOWS.create());
                     nav.addItem(win);
@@ -70,6 +72,11 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
         base.addItem(item2);
         item.addItem(subItem);
         nav.addItem(base);
+
+        TopNavItem logout = new TopNavItem("Logout", "logout");
+        logout.addClassNames("logout");
+        nav.addItem(logout);
+
         return nav;
     }
 
@@ -86,11 +93,12 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
 
     @Override
     public void afterNavigation(AfterNavigationEvent event) {
-        // TODO this probably doesn't make sense, with multiple windows highlighting becomes kind of useless
         String path = event.getLocation().getPath();
+        if ("logout".equals(path)) {
+            authenticationContext.logout();
+        }
         nav.getChildren().forEach(comp -> {
-            if (comp instanceof TopNavItem) {
-                TopNavItem item = (TopNavItem) comp;
+            if (comp instanceof TopNavItem item) {
                 if (path.equals(item.getPath())) {
                     item.getElement().setAttribute("active", "true");
                 } else {
@@ -98,5 +106,19 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        super.onAttach(attachEvent);
+        // very simple browser window close confirmation
+        var js = """
+                window.addEventListener('beforeunload', (evt) => {
+                    const msg = 'foo';
+                    (evt || window.event).returnValue = msg;
+                    return msg;
+                  });
+                """;
+        attachEvent.getUI().getElement().executeJs(js);
     }
 }

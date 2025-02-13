@@ -93,3 +93,7 @@ vaadin-app-layout::part(navbar) {
     z-index: 1000;
     transform: translate(0);
 }
+
+vaadin-side-nav-item.logout {
+    margin-left: auto;
+}

@@ -5,10 +5,12 @@ import com.example.application.components.window.WindowContent;
 import com.example.application.components.window.WindowData;
 import com.example.application.components.window.WindowFactory;
 import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.UIScope;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.context.ApplicationContext;
@@ -26,6 +28,7 @@ public class WindowManagerWindow extends Div {
     private final Grid<WindowData> windowGrid;
     private final ApplicationContext applicationContext;
     private WindowFactory windowFactory;
+    private Registration registration;
 
     public WindowManagerWindow(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
@@ -34,7 +37,7 @@ public class WindowManagerWindow extends Div {
         windowGrid.addColumn(WindowData::getWindowNumber).setHeader("Window Number");
         windowGrid.addComponentColumn(windowData -> {
             Button openButton = new Button("Focus", e -> {
-                Window window = windowFactory.getOrCreateWindow(windowData.getName(), windowData.getWindowNumber());
+                Window window = windowFactory.getWindowInstance(windowData.getName(), windowData.getWindowNumber());
                 if (window.isMini()) {
                     window.restore();
                     window.setPosition(windowData.getWindowContent().left(), windowData.getWindowContent().top());
@@ -47,7 +50,7 @@ public class WindowManagerWindow extends Div {
         });
         windowGrid.addComponentColumn(windowData -> {
             Button openButton = new Button("Hide", e -> {
-                Window window = windowFactory.getOrCreateWindow(windowData.getName(), windowData.getWindowNumber());
+                Window window = windowFactory.getWindowInstance(windowData.getName(), windowData.getWindowNumber());
                 window.minimize();
             });
             openButton.setIcon(VaadinIcon.ARROW_DOWN.create());
@@ -63,11 +66,17 @@ public class WindowManagerWindow extends Div {
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
         windowFactory = applicationContext.getBean(WindowFactory.class);
-        windowFactory.addWindowCreatedListener(e -> {
+        registration = windowFactory.addWindowCreatedListener(e -> {
             if (windowGrid.isAttached()) {
                 attachEvent.getUI().access(() -> windowGrid.setItems(windowFactory.getOpenedWindows()));
             }
         });
         windowGrid.setItems(windowFactory.getOpenedWindows());
+    }
+
+    @Override
+    protected void onDetach(DetachEvent detachEvent) {
+        super.onDetach(detachEvent);
+        registration.remove();
     }
 }

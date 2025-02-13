@@ -156,9 +156,9 @@ public class Window extends Dialog {
             oldLeft = left;
             oldWidth = width;
             oldHeight = height;
-            doSetPosition("0px", "0px");
+            doSetPosition("0px", "50px");
             setWidth("99.9%");
-            setHeight("99.9%");
+            setHeight("95%");
         } else {
             wasMini = false;
             max = false;
