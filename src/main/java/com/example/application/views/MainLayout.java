@@ -66,11 +66,16 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
         TopNavItem base = new TopNavItem("Root menu");
         TopNavItem item = new TopNavItem("Item");
         TopNavItem item2 = new TopNavItem("Another item");
-        TopNavItem subItem = new TopNavItem("SubItem");
-        subItem.addClassNames("sub");
+        TopNavItem item3 = new TopNavItem("Another item2");
+        TopNavItem subItem1 = new TopNavItem("SubItem1");
+        TopNavItem subItem2 = new TopNavItem("SubItem2");
+        TopNavItem subItem3 = new TopNavItem("SubItem3 with much longer text");
+        TopNavItem subItem4 = new TopNavItem("SubItem4");
+        TopNavItem subItem5 = new TopNavItem("SubItem5");
         base.addItem(item);
         base.addItem(item2);
-        item.addItem(subItem);
+        item2.addItem(subItem1, subItem2, subItem3, subItem4, subItem5);
+        base.addItem(item3);
         nav.addItem(base);
 
         TopNavItem logout = new TopNavItem("Logout", "logout");
