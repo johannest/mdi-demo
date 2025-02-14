@@ -97,3 +97,11 @@ vaadin-app-layout::part(navbar) {
 vaadin-side-nav-item.logout {
     margin-left: auto;
 }
+
+vaadin-side-nav vaadin-side-nav-item vaadin-side-nav-item::part(children) {
+    transform: translate(100%, calc(-100% + var(--lumo-space-xs)));
+}
+
+vaadin-side-nav vaadin-side-nav-item vaadin-side-nav-item[expanded]::part(toggle-button)::before {
+    transform: rotate(-90deg);
+}
