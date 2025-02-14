@@ -98,6 +98,10 @@ vaadin-side-nav-item.logout {
     margin-left: auto;
 }
 
+vaadin-side-nav-item:hover {
+    background: var(--lumo-primary-color-10pct);
+}
+
 vaadin-side-nav vaadin-side-nav-item vaadin-side-nav-item::part(children) {
     transform: translate(100%, calc(-100% + var(--lumo-space-xs)));
 }
