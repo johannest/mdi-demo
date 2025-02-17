@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
@@ -130,6 +131,7 @@ public class WindowFactory {
         WindowData windowData = new WindowData(windowName, contentAnnotation.title(), windowNumber, contentAnnotation, window);
         windowList.add(windowData);
         window.add(content);
+        ComponentUtil.setData(content, WindowData.class, windowData);
         viewToWindowData.put(content, windowData);
         eventHandlers.forEach(e -> e.accept(window));
         return window;
