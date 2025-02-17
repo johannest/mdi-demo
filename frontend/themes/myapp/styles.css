@@ -102,10 +102,11 @@ vaadin-side-nav-item:hover {
     background: var(--lumo-primary-color-10pct);
 }
 
-vaadin-side-nav vaadin-side-nav-item vaadin-side-nav-item::part(children) {
-    transform: translate(100%, calc(-100% + var(--lumo-space-xs)));
-}
-
 vaadin-side-nav vaadin-side-nav-item vaadin-side-nav-item[expanded]::part(toggle-button)::before {
     transform: rotate(-90deg);
+}
+
+vaadin-side-nav vaadin-side-nav-item vaadin-side-nav-item::part(children) {
+    margin-block-start: calc((var(--lumo-size-m) + var(--lumo-space-s)) / -1);
+    margin-inline-start: 100%;
 }
