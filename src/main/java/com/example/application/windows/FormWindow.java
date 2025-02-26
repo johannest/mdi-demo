@@ -24,7 +24,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 
 @Scope(SCOPE_PROTOTYPE)
 @Component
-@WindowContent(value = "form", title = "Form", top = "50%", left = "10%", height = "50%", width = "75%")
+@WindowContent(value = "form", title = "Form", height = "50%", width = "45%")
 @PermitAll
 public class FormWindow extends FormLayout {
     private Logger logger = LoggerFactory.getLogger(FormWindow.class);
