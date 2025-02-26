@@ -48,10 +48,15 @@ public class PersonListWindow extends Div {
             button.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
             button.setIcon(VaadinIcon.EDIT.create());
             button.addClickListener(event -> {
-                Optional<WindowAndContent> windowAndContent = windowFactory.getWindowInstance(MaritalStatusEditWindow.WINDOW_NAME);
-                windowAndContent.ifPresent(windowNContent -> {
-                    createEditMaritalStatusEditWindow(person, windowNContent);
-                });
+                // get access to the Window where this window content is added
+                Optional<Window> currentWindow = WindowFactory.getWindow(PersonListWindow.this);
+                if (currentWindow.isPresent()) {
+                    // create "modal" window for editing the marital status
+                    Optional<WindowAndContent> windowAndContent = windowFactory.getModalWindowInstance(currentWindow.get(), MaritalStatusEditWindow.WINDOW_NAME);
+                    windowAndContent.ifPresent(windowNContent -> {
+                        createEditMaritalStatusEditWindow(person, windowNContent);
+                    });
+                }
             });
             Div wrap = new Div(maritalStatusValue, button);
             wrap.addClassNames(LumoUtility.Display.FLEX);
@@ -69,7 +74,7 @@ public class PersonListWindow extends Div {
             maritalStatusEditWindow.setPerson(person);
         }
         window.addOpenedChangeListener(e -> {
-           refresh();
+            refresh();
         });
         windowFactory.addBeanToWindow(person, window);
     }

@@ -113,6 +113,25 @@ public class WindowFactory {
         return Optional.empty();
     }
 
+    /*
+     * Create "modal" sub window by disabling the parent window when the child window is opened
+     *
+     * @param parentWindow parent Window instance which should not be accessible while the child window is open
+     *
+     * @param contentAnnotationAndClass window definition in the annotation
+     * @return newly created (child) Window instance
+     */
+    private Optional<WindowAndContent> createModalWindow(Window parentWindow, WindowContentAndClass contentAnnotationAndClass) {
+        Optional<WindowAndContent> windowAndContent = createWindow(contentAnnotationAndClass);
+        if (windowAndContent.isPresent()) {
+            Window modalChildWindow = windowAndContent.get().window();
+            modalChildWindow.addOpenedChangeListener(event -> {
+                parentWindow.setEnabled(!event.isOpened());
+            });
+        }
+        return windowAndContent;
+    }
+
     private Window createNewWindowInstance(WindowContent contentAnnotation, List<WindowData> windowList, String windowName, Component content) {
         int windowNumber = windowList.stream().map(WindowData::getWindowNumber).max(Integer::compare).map(e -> e + 1).orElse(1);
         Window window = new Window(contentAnnotation.title(),
@@ -173,6 +192,17 @@ public class WindowFactory {
      */
     public Optional<WindowAndContent> getWindowInstance(String name) {
         return createWindow(windowNameToContentAndClass.get(name));
+    }
+
+    /**
+     * Get or create "modal" Window by disabling the parent window when the child window is opened
+     * @param parentWindow parent window which should be disabled while the child window is open
+     * @param name unique window name identifier
+     * @return if the window can be instantiated multiple times, new instance is returned,
+     * otherwise the possible existing instance is returned or first new one
+     */
+    public Optional<WindowAndContent> getModalWindowInstance(Window parentWindow, String name) {
+        return createModalWindow(parentWindow, windowNameToContentAndClass.get(name));
     }
 
     /**
@@ -300,5 +330,20 @@ public class WindowFactory {
     
     public Optional<WindowData> getWindowDataForView(Component view) {
     	return Optional.ofNullable(viewToWindowData.get(view));
+    }
+
+    /**
+     * Utility to return Window instance for the given content component
+     * Note! This assumes that the given component is added directly to a Window
+     *
+     * @param content content of Window
+     * @return Window where the content is added
+     */
+    public static Optional<Window> getWindow(com.vaadin.flow.component.Component content) {
+        Optional<com.vaadin.flow.component.Component> parent = content.getParent();
+        if (parent.isPresent() && parent.get() instanceof Window window) {
+            return Optional.of(window);
+        }
+        return Optional.empty();
     }
 }

@@ -102,6 +102,8 @@ public class Window extends Dialog {
         super.onAttach(attach);
         getElement().executeJs(
                 """
+                        // do to allow focus trapping
+                        this.$.overlay.focusTrap = false;
                         const overlay = this._overlayElement;
                         overlay.addEventListener('mouseup', (e) => {
                             if (!overlay.getAttribute('class').includes('mini')) {
@@ -181,11 +183,11 @@ public class Window extends Dialog {
         if (isOpened()) {
             getElement().executeJs("""
                     return this._overlayElement.style.zIndex;
-                            """).then(ind -> {
+                    """).then(ind -> {
                 zIndex = ind.asString();
                 getElement().executeJs("""
                         return this._overlayElement.style.zIndex=1;
-                                """);
+                        """);
             });
         }
         updateTop();
@@ -218,13 +220,10 @@ public class Window extends Dialog {
     }
 
     private void doSetPosition(String left, String top) {
-        setTop(top);
-        setLeft(left);
-// With Vaadin versions prior to 24.6 use this:
-//        getElement().executeJs("""
-//                this._overlayElement.$.overlay.style.left=$0;
-//                this._overlayElement.$.overlay.style.top=$1;
-//                        """, left, top);
+        getElement().executeJs("""
+                this._overlayElement.$.overlay.style.left=$0;
+                this._overlayElement.$.overlay.style.top=$1;
+                """, left, top);
     }
 
     @Override
@@ -256,10 +255,25 @@ public class Window extends Dialog {
                                 left = left + 300;
                             }
                         }
-                                """);
+                        """);
     }
 
     public boolean isMini() {
         return mini;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        if (enabled) {
+            removeClassName("disabled");
+        } else {
+            addClassName("disabled");
+        }
+        setResizable(enabled);
+        setDraggable(enabled);
+        closeButton.setEnabled(enabled);
+        maximizeButton.setEnabled(enabled);
+        minimizeButton.setEnabled(enabled);
     }
 }
