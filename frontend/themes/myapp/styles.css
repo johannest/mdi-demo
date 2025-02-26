@@ -93,6 +93,10 @@ vaadin-dialog-overlay.window.disabled::part(overlay) {
     pointer-events: none;
 }
 
+vaadin-dialog-overlay h3[disabled] {
+    pointer-events: none;
+}
+
 vaadin-app-layout::part(navbar) {
     z-index: 1000;
     transform: translate(0);
