@@ -196,6 +196,7 @@ public class WindowFactory {
 
     /**
      * Get or create "modal" Window by disabling the parent window when the child window is opened
+     *
      * @param parentWindow parent window which should be disabled while the child window is open
      * @param name unique window name identifier
      * @return if the window can be instantiated multiple times, new instance is returned,
@@ -203,6 +204,19 @@ public class WindowFactory {
      */
     public Optional<WindowAndContent> getModalWindowInstance(Window parentWindow, String name) {
         return createModalWindow(parentWindow, windowNameToContentAndClass.get(name));
+    }
+
+    /**
+     * Get or create "modal" Window by disabling the parent window when the child window is opened
+     *
+     * @param component component of the parent window which should be disabled while the child window is open
+     * @param name unique window name identifier
+     * @return if the window can be instantiated multiple times, new instance is returned,
+     * otherwise the possible existing instance is returned or first new one
+     */
+    public Optional<WindowAndContent> getModalWindowInstance(com.vaadin.flow.component.Component component, String name) {
+        Optional<Window> window = getWindow(component);
+        return window.flatMap(value -> createModalWindow(value, windowNameToContentAndClass.get(name)));
     }
 
     /**
