@@ -48,10 +48,10 @@ public class DifferentFormWindow extends VerticalLayout {
 
     private void createClickListener(WindowFactory windowFactory, TextField textField) {
         Optional<WindowAndContent> modalWindowInstance = windowFactory.getModalWindowInstance(DifferentFormWindow.this, TextEditWindow.WINDOW_NAME);
-        modalWindowInstance.ifPresent(window -> {
-            window.window().open();
-            if (window.content() instanceof TextEditWindow textEditWindow) {
-                // set the current value to modal edit window
+        modalWindowInstance.ifPresent(windowAndContent -> {
+            windowAndContent.window().open();
+            if (windowAndContent.content() instanceof TextEditWindow textEditWindow) {
+                // set the current value to modal edit windowAndContent
                 textEditWindow.setValue(textField.getValue());
                 // add listener
                 textEditWindow.setEditWindowListener(new EditWindowListener<>() {
@@ -59,13 +59,13 @@ public class DifferentFormWindow extends VerticalLayout {
                     public void onSave(String value) {
                         // "save" value
                         textField.setValue(value);
-                        window.window().close();
+                        windowAndContent.window().close();
                     }
 
                     @Override
                     public void onCancel() {
-                        // just close the modal window
-                        window.window().close();
+                        // just close the modal windowAndContent
+                        windowAndContent.window().close();
                     }
                 });
             }
