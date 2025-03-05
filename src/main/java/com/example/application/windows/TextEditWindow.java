@@ -1,7 +1,7 @@
 package com.example.application.windows;
 
 import com.example.application.components.window.EditWindowListener;
-import com.example.application.components.window.HasEditWindowListener;
+import com.example.application.components.window.EditWindow;
 import com.example.application.components.window.WindowContent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
@@ -16,9 +16,9 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 
 @Scope(SCOPE_PROTOTYPE)
 @Component
-@WindowContent(value = WINDOW_NAME, title = "Edit text value", left = "80%", width = "200x", height = "220px", showInMenu = false)
+@WindowContent(value = WINDOW_NAME, title = "Edit text value", left = "50%", width = "200x", height = "220px", showInMenu = false)
 @PermitAll
-public class TextEditWindow extends Div implements HasEditWindowListener<String> {
+public class TextEditWindow extends Div implements EditWindow<String> {
 
     public static final String WINDOW_NAME = "text-edit";
     private final TextField editText;
@@ -45,8 +45,9 @@ public class TextEditWindow extends Div implements HasEditWindowListener<String>
         add(editText, buttonWrap);
     }
 
-    public void setTextValue(String text) {
-        editText.setValue(text);
+    @Override
+    public void setValue(String value) {
+        editText.setValue(value);
     }
 
     @Override

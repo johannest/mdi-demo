@@ -52,7 +52,7 @@ public class DifferentFormWindow extends VerticalLayout {
             window.window().open();
             if (window.content() instanceof TextEditWindow textEditWindow) {
                 // set the current value to modal edit window
-                textEditWindow.setTextValue(textField.getValue());
+                textEditWindow.setValue(textField.getValue());
                 // add listener
                 textEditWindow.setEditWindowListener(new EditWindowListener<>() {
                     @Override
